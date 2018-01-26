@@ -12,40 +12,41 @@ public class ListFragment extends Fragment
 {
 	protected ListFragmentType type;
 	protected Cursor cursor;
+	protected View view;
 	protected long id = -1;
 	int layout;
 	
-	public static ListFragment getInstance(Cursor c, ListFragmentType type, long id) {
-		ListFragment frag = new ListFragment();
+	public static ListFragment getInstance(Cursor c, ListFragmentType type, long id, int layout) {
+		ListFragment frag = new ListFragment(layout);
 		frag.type = type;
 		frag.id = id;
 		frag.cursor = c;
-		if(type == ListFragmentType.ALL_TRACKS){
-			frag.layout = R.layout.listitem_track;
-		}
 		return frag;
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
+	private ListFragment(int layout) {
+		this.layout = layout;
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		View v = inflater.inflate(layout, container, false);
-		ListAdapter adapter = new TrackListAdapter(getContext(), cursor);
-		ListView listView = (ListView) v.findViewById(R.id.fragmentlistview_listView);
-		listView.setAdapter(adapter);
-		
-		return v;
+		view = inflater.inflate(layout, container, false);
+		if(view != null)
+			return view;
+		else 
+			return super.onCreateView(inflater, container,savedInstanceState);
 	}
 	
 	public void setCursor(Cursor c) {
 		cursor = c;
-		
+	}
+	
+	public void setAdapter(ListAdapter adapter) {
+		if(view != null) {
+			ListView listView = (ListView) view.findViewById(R.id.fragmentlistview_listView);
+			listView.setAdapter(adapter);
+		}
 	}
 }
 
