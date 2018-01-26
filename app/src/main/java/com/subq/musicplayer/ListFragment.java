@@ -4,20 +4,49 @@ import android.widget.*;
 import android.database.*;
 import android.view.*;
 import android.content.*;
+import android.os.*;
+import android.database.sqlite.*;
+import android.provider.*;
 
 public class ListFragment extends Fragment
 {
 	protected ListFragmentType type;
+	protected Cursor cursor;
 	protected long id = -1;
+	int layout;
 	
-	
-	public ListFragment getInstance(ListFragmentType type, CursorAdapter adapter) {
+	public static ListFragment getInstance(Cursor c, ListFragmentType type, long id) {
 		ListFragment frag = new ListFragment();
-		this.type = type;
+		frag.type = type;
+		frag.id = id;
+		frag.cursor = c;
+		if(type == ListFragmentType.ALL_TRACKS){
+			frag.layout = R.layout.listitem_track;
+		}
 		return frag;
 	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
+		View v = inflater.inflate(layout, container, false);
+		ListAdapter adapter = new TrackListAdapter(getContext(), cursor);
+		ListView listView = (ListView) v.findViewById(R.id.fragmentlistview_listView);
+		listView.setAdapter(adapter);
+		
+		return v;
+	}
 	
-	
+	public void setCursor(Cursor c) {
+		cursor = c;
+		
+	}
 }
 
 enum ListFragmentType{
@@ -26,4 +55,8 @@ enum ListFragmentType{
 	ALL_ARTISTS,
 	ARTIST,
 	ALBUM
-}
+	}
+
+
+
+
